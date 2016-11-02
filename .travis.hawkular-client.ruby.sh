@@ -37,7 +37,8 @@ pushd hawkular-client-ruby
 bundle install
 sed -i "s/  image: .*hawkular-services/  image: \"`whoami`\/hawkular-services/g" docker-compose.yml
 ./.travis/start_hawkular_services.sh && ./.travis/wait_for_services.rb && \
-sleep 20s
+# Wait some time for the Hawkular Wildfly Agent to finish.
+sleep 60s
 
 RUN_ON_LIVE_SERVER=1 \
 VCR_UPDATE=1 \
