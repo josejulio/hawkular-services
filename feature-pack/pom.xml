@@ -34,6 +34,8 @@
   <properties>
     <hawkular.embeddedc>false</hawkular.embeddedc>
     <feature-pack-build-xml>feature-pack-build.xml</feature-pack-build-xml>
+    <version.org.codehaus.gmaven.groovy-maven-plugin>2.0</version.org.codehaus.gmaven.groovy-maven-plugin>
+    <version.org.yaml.snakeyaml>1.18</version.org.yaml.snakeyaml>
   </properties>
 
   <dependencies>
@@ -59,7 +61,7 @@
 
     <dependency>
       <groupId>org.hawkular.agent</groupId>
-      <artifactId>hawkular-wildfly-agent-feature-pack</artifactId>
+      <artifactId>hawkular-javaagent-wildfly-feature-pack</artifactId>
       <type>zip</type>
     </dependency>
 
@@ -105,6 +107,17 @@
   </dependencies>
 
   <build>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.gmaven</groupId>
+          <artifactId>groovy-maven-plugin</artifactId>
+          <version>${version.org.codehaus.gmaven.groovy-maven-plugin}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
     <plugins>
 
       <!-- Unpack the upstream artifacts that host various *.xml files that we want to use unchanged or adapt in the next steps -->
@@ -131,9 +144,9 @@
 
                 <artifactItem>
                   <groupId>org.hawkular.agent</groupId>
-                  <artifactId>hawkular-wildfly-agent-feature-pack</artifactId>
+                  <artifactId>hawkular-javaagent-wildfly-feature-pack</artifactId>
                   <type>zip</type>
-                  <includes>subsystem-templates/*.xml,configuration/**/*.xml</includes>
+                  <includes>content/**</includes>
                   <outputDirectory>${project.build.directory}/feature-pack-resources</outputDirectory>
                 </artifactItem>
 
@@ -205,10 +218,6 @@
                   <stylesheet>${basedir}/src/main/xsl/configuration/standalone/hawkular-services-template.xsl</stylesheet>
                   <!-- without the default user in the default profile -->
                   <parameters>
-                    <parameter>
-                      <name>hawkular.agent.enabled</name>
-                      <value>${hawkular.agent.enabled}</value>
-                    </parameter>
                     <parameter>
                       <name>hawkular.embeddedc</name>
                       <value>${hawkular.embeddedc}</value>
@@ -316,21 +325,6 @@
                   </fileMappers>
                 </transformationSet>
 
-                <transformationSet>
-                  <dir>${project.build.directory}/feature-pack-resources</dir>
-                  <stylesheet>${basedir}/src/main/xsl/subsystem-templates/hawkular-wildfly-agent-ssl.xsl</stylesheet>
-                  <includes>
-                    <include>subsystem-templates/hawkular-wildfly-agent.xml</include>
-                  </includes>
-                  <outputDir>${project.build.directory}/feature-pack-resources</outputDir>
-                  <fileMappers>
-                    <fileMapper implementation="org.codehaus.plexus.components.io.filemappers.RegExpFileMapper">
-                      <pattern>^.*$</pattern>
-                      <replacement>subsystem-templates/hawkular-wildfly-agent-ssl.xml</replacement>
-                    </fileMapper>
-                  </fileMappers>
-                </transformationSet>
-
               </transformationSets>
             </configuration>
           </execution>
@@ -387,6 +381,15 @@
       <build>
         <plugins>
           <plugin>
+            <groupId>com.mycila</groupId>
+            <artifactId>license-maven-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>src/main/resources/hawkular-security-realm.yaml</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+          <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>xml-maven-plugin</artifactId>
             <executions>
@@ -405,21 +408,8 @@
                       <stylesheet>${basedir}/src/main/xsl/configuration/standalone/hawkular-services-template.xsl</stylesheet>
                       <parameters>
                         <parameter>
-                          <name>hawkular.agent.enabled</name>
-                          <value>${hawkular.agent.enabled}</value>
-                        </parameter>
-                        <parameter>
                           <name>hawkular.embeddedc</name>
                           <value>${hawkular.embeddedc}</value>
-                        </parameter>
-                        <!-- with the default user in the dev profile -->
-                        <parameter>
-                          <name>hawkular.rest.user</name>
-                          <value>${hawkular.rest.user}</value>
-                        </parameter>
-                        <parameter>
-                          <name>hawkular.rest.password</name>
-                          <value>${hawkular.rest.password}</value>
                         </parameter>
                       </parameters>
                       <includes>
@@ -435,6 +425,34 @@
                     </transformationSet>
 
                   </transformationSets>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.gmaven</groupId>
+            <artifactId>groovy-maven-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${version.org.yaml.snakeyaml}</version>
+              </dependency>
+            </dependencies>
+            <executions>
+              <execution>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <defaults>
+                    <project.build.directory>${project.build.directory}</project.build.directory>
+                    <hawkular.agent.enabled>${hawkular.agent.enabled}</hawkular.agent.enabled>
+                    <hawkular.rest.user>${hawkular.rest.user}</hawkular.rest.user>
+                    <hawkular.rest.password>${hawkular.rest.password}</hawkular.rest.password>
+                  </defaults>
+                  <source>${project.basedir}/src/main/script/build-javaagent-config.groovy</source>
                 </configuration>
               </execution>
             </executions>

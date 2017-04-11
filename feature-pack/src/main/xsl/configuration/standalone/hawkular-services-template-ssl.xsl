@@ -37,17 +37,6 @@
         </xsl:element>
       </xsl:element>
     </xsl:element>
-
-    <xsl:element name="security-realm" namespace="{namespace-uri()}">
-      <xsl:attribute name="name">HawkularAgentRealm</xsl:attribute>
-      <xsl:element name="authentication" namespace="{namespace-uri()}">
-        <xsl:element name="truststore" namespace="{namespace-uri()}">
-          <xsl:attribute name="path">hawkular.keystore</xsl:attribute>
-          <xsl:attribute name="relative-to">jboss.server.config.dir</xsl:attribute>
-          <xsl:attribute name="keystore-password">hawkular</xsl:attribute>
-        </xsl:element>
-      </xsl:element>
-    </xsl:element>
     <xsl:copy>
       <xsl:apply-templates select="node()|comment()|@*"/>
     </xsl:copy>

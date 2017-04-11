@@ -90,7 +90,7 @@
 
       <dependency>
         <groupId>org.hawkular.agent</groupId>
-        <artifactId>hawkular-wildfly-agent-feature-pack</artifactId>
+        <artifactId>hawkular-javaagent-wildfly-feature-pack</artifactId>
         <version>${version.org.hawkular.agent}</version>
         <type>zip</type>
       </dependency>
