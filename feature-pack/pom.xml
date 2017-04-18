@@ -34,8 +34,6 @@
   <properties>
     <hawkular.embeddedc>false</hawkular.embeddedc>
     <feature-pack-build-xml>feature-pack-build.xml</feature-pack-build-xml>
-    <version.org.codehaus.gmaven.groovy-maven-plugin>2.0</version.org.codehaus.gmaven.groovy-maven-plugin>
-    <version.org.yaml.snakeyaml>1.18</version.org.yaml.snakeyaml>
   </properties>
 
   <dependencies>
@@ -107,17 +105,6 @@
   </dependencies>
 
   <build>
-
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.codehaus.gmaven</groupId>
-          <artifactId>groovy-maven-plugin</artifactId>
-          <version>${version.org.codehaus.gmaven.groovy-maven-plugin}</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-
     <plugins>
 
       <!-- Unpack the upstream artifacts that host various *.xml files that we want to use unchanged or adapt in the next steps -->
@@ -370,6 +357,34 @@
         </executions>
       </plugin>
 
+      <plugin>
+        <groupId>org.codehaus.gmaven</groupId>
+        <artifactId>groovy-maven-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>${version.org.yaml.snakeyaml}</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <defaults>
+                <project.build.directory>${project.build.directory}</project.build.directory>
+                <hawkular.agent.enabled>${hawkular.agent.enabled}</hawkular.agent.enabled>
+                <hawkular.rest.user>${hawkular.rest.user}</hawkular.rest.user>
+                <hawkular.rest.password>${hawkular.rest.password}</hawkular.rest.password>
+              </defaults>
+              <source>${project.basedir}/src/main/script/build-javaagent-config.groovy</source>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 
@@ -425,34 +440,6 @@
                     </transformationSet>
 
                   </transformationSets>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.gmaven</groupId>
-            <artifactId>groovy-maven-plugin</artifactId>
-            <dependencies>
-              <dependency>
-                <groupId>org.yaml</groupId>
-                <artifactId>snakeyaml</artifactId>
-                <version>${version.org.yaml.snakeyaml}</version>
-              </dependency>
-            </dependencies>
-            <executions>
-              <execution>
-                <phase>generate-resources</phase>
-                <goals>
-                  <goal>execute</goal>
-                </goals>
-                <configuration>
-                  <defaults>
-                    <project.build.directory>${project.build.directory}</project.build.directory>
-                    <hawkular.agent.enabled>${hawkular.agent.enabled}</hawkular.agent.enabled>
-                    <hawkular.rest.user>${hawkular.rest.user}</hawkular.rest.user>
-                    <hawkular.rest.password>${hawkular.rest.password}</hawkular.rest.password>
-                  </defaults>
-                  <source>${project.basedir}/src/main/script/build-javaagent-config.groovy</source>
                 </configuration>
               </execution>
             </executions>
