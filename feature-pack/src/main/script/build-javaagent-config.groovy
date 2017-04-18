@@ -53,6 +53,10 @@ parser.dump(config, new FileWriter(JAVAAGENT_CONFIG))
 config['storage-adapter']['security-realm'] = 'HawkularAgentRealm'
 config['storage-adapter']['url'] = template('hawkular.rest.host', 'https://127.0.0.1:8443')
 
+config['managed-servers']['remote-dmr'][0]['security-realm'] = 'HawkularAgentRealm'
+config['managed-servers']['remote-dmr'][0]['use-ssl'] = true
+config['managed-servers']['remote-dmr'][0]['port'] = template('jboss.management.https.port', 9993)
+
 securityRealm = new HashMap()
 securityRealm['name'] = 'HawkularAgentRealm'
 securityRealm['keystore-path'] = "\${env.JBOSS_HOME}/standalone/configuration//hawkular.keystore"
