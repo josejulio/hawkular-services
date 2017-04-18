@@ -40,7 +40,7 @@ config['storage-adapter']['url'] = template('hawkular.rest.host', 'http://127.0.
 
 // Disable local-dmr and use a remote-dmr which allows a more detailed configuration.
 config['managed-servers']['local-dmr']['enabled'] = false
-config['managed-servers']['remote-dmr'][0]['name'] = 'Hawkular Services DMR'
+config['managed-servers']['remote-dmr'][0]['name'] = 'Local'
 config['managed-servers']['remote-dmr'][0]['enabled'] = true
 config['managed-servers']['remote-dmr'][0]['port'] = template('jboss.management.http.port', 9990)
 config['managed-servers']['remote-dmr'][0]['username'] = template('hawkular.rest.user')
