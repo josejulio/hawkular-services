@@ -17,6 +17,7 @@
 #
 
 KEYSTORE_HOME="${JBOSS_HOME}/standalone/configuration"
+PUBLIC_KEY="/client-secrets/hawkular-services-public.pem"
 
 # creates the empty ${KEYSTORE_HOME}/hawkular.keystore file
 create_empty_keystore() {
@@ -30,6 +31,10 @@ add_cert_as_trusted() {
   # export the public key from the keystore
   keytool -export -alias hawkular -file ${KEYSTORE_HOME}/hawkular.cert -storepass hawkular \
     -keystore ${KEYSTORE_HOME}/hawkular.keystore
+
+  # Export hawkular.cert to PEM format and copy to client-secrets
+  openssl x509 -inform der -in ${KEYSTORE_HOME}/hawkular.cert -out ${KEYSTORE_HOME}/hawkular.pem
+  mv ${KEYSTORE_HOME}/hawkular.pem ${PUBLIC_KEY} || rm ${KEYSTORE_HOME}/hawkular.pem
 
   # and import it as a trusted certificate for the current JDK
   keytool -import -keystore $JAVA_HOME/jre/lib/security/cacerts -alias hawkular -storepass changeit \
@@ -48,7 +53,7 @@ use_standalone_ssl_config() {
 add_certificate() {
   if [[ ${HAWKULAR_USE_SSL} = "true" ]]; then
     local _private_key="/client-secrets/hawkular-services-private.key"
-    local _public_key="/client-secrets/hawkular-services-public.pem"
+    local _public_key=$PUBLIC_KEY
     local _keypair="/client-secrets/hawkular-services.pkcs12"
 
     if [[ -f ${_private_key} ]] && [[ -s ${_private_key} ]] && \
