@@ -33,8 +33,10 @@ add_cert_as_trusted() {
     -keystore ${KEYSTORE_HOME}/hawkular.keystore
 
   # Export hawkular.cert to PEM format and copy to client-secrets
-  openssl x509 -inform der -in ${KEYSTORE_HOME}/hawkular.cert -out ${KEYSTORE_HOME}/hawkular.pem
-  mv ${KEYSTORE_HOME}/hawkular.pem ${PUBLIC_KEY} || rm ${KEYSTORE_HOME}/hawkular.pem
+  if [[ -d `dirname $PUBLIC_KEY` ]]; then
+    openssl x509 -inform der -in ${KEYSTORE_HOME}/hawkular.cert -out ${KEYSTORE_HOME}/hawkular.pem
+    mv ${KEYSTORE_HOME}/hawkular.pem ${PUBLIC_KEY} || rm ${KEYSTORE_HOME}/hawkular.pem
+  fi
 
   # and import it as a trusted certificate for the current JDK
   keytool -import -keystore $JAVA_HOME/jre/lib/security/cacerts -alias hawkular -storepass changeit \
