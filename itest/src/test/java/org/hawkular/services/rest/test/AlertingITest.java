@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Red Hat, Inc. and/or its affiliates
+ * Copyright 2016-2017 Red Hat, Inc. and/or its affiliates
  * and other contributors as indicated by the @author tags.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,14 +31,13 @@ import org.testng.annotations.Test;
 public class AlertingITest extends AbstractTestBase {
     private static final Logger log = Logger.getLogger(AlertingITest.class);
     public static final String GROUP = "AlertingITest";
-    private static final String alertingPath = "/hawkular/alerts";
 
     @Test(groups = { GROUP })
     @RunAsClient
     public void alertingUp() throws Throwable {
 
         final String path = alertingPath + "/status";
-        final String expectedState = "STARTED";
+        final String expectedState = "UP";
         testClient.newRequest()
                 .path(path)
                 .get()

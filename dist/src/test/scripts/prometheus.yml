@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 #
 # Copyright 2016-2017 Red Hat, Inc. and/or its affiliates
 # and other contributors as indicated by the @author tags.
@@ -16,23 +15,18 @@
 # limitations under the License.
 #
 
-if [ -z ${1} ]; then
-   echo "Missing Cassandra node address"
-   exit 1
-fi
+global:
+  scrape_interval: 15s
 
-while : ; do
-   timeout 5 nc -w 2 $1 9160 > /dev/null 2>&1
-   status=$?
-   if [[ $status -eq 2 ]]; then
-     echo "Invalid host"
-     exit 2
-   fi
+scrape_configs:
+  # Monitor prometheus itself.
+  - job_name: prometheus
+    static_configs:
+    - targets: ['localhost:9090']
 
-   if [[ $status -eq 124 || $status -eq 0 ]]; then
-     echo "DB service online"
-     exit 0
-   fi
-done
-
-exit 124
+  # For testing, check for new files very often - 10s.
+  - job_name: hawkular
+    file_sd_configs:
+    - files:
+      - /var/hawkular/data/prometheus/*.json
+      refresh_interval: 10s

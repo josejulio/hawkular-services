@@ -16,35 +16,6 @@
 # limitations under the License.
 #
 
-check_cassandra() {
-  # Check that cassandra is available and responding
-  if [ !  -z "${CASSANDRA_NODES}" ]; then
-    echo " ## Using external storage nodes ##"
-    export HAWKULAR_BACKEND=remote
-  elif [ ! -z "${CASSANDRA_SERVICE}" ]; then
-    echo " ## Using Kubernetes-style named service"
-    eval "s=${CASSANDRA_SERVICE^^}_SERVICE_HOST"
-    export CASSANDRA_NODES=${!s}
-    HAWKULAR_BACKEND=remote
-  fi
-
-  echo "CASSANDRA_NODES='${CASSANDRA_NODES}'"
-
-  if [ ! -z "${DB_TIMEOUT}" ]; then
-    echo "Waiting for DB (timeout=${DB_TIMEOUT})"
-    DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-    timeout "${DB_TIMEOUT}" "${DIR}/check-cnode.sh" ${CASSANDRA_NODES}
-    status=$?
-    if [[ $status -eq 124 ]]; then
-      echo "DB timed out"
-      exit $?
-    fi
-    if [ ! $status ]; then
-      exit 1
-    fi
-  fi
-}
-
 get_credentials() {
   # The username is obtained as a content of file '/client-secrets/hawkular-services.username'
   # if the file does not exist or is empty, the value of $HAWKULAR_USER is used
@@ -114,17 +85,20 @@ create_user() {
 }
 
 run_hawkular_services() {
-  ${JBOSS_HOME}/bin/standalone.sh -b 0.0.0.0 \
+  export HAWKULAR_USER=${username}
+  export HAWKULAR_PASSWORD=${password}
+  ${JBOSS_HOME}/bin/standalone.sh \
+         -b 0.0.0.0 \
          -bmanagement 0.0.0.0 \
          -Djboss.server.data.dir=${HAWKULAR_DATA:-/var/opt/hawkular}/data \
          -Djboss.server.log.dir=${HAWKULAR_DATA:-/var/opt/hawkular}/log \
          -Dactivemq.artemis.client.global.thread.pool.max.size=${HAWKULAR_JMS_THREAD_POOL:-30} \
          -Dhawkular.agent.enabled=${HAWKULAR_AGENT_ENABLE} \
-         -Dhawkular.rest.user=${username} \
-         -Dhawkular.rest.password=${password} \
-         -Dhawkular.metrics.default-ttl=${HAWKULAR_METRICS_TTL:-14} \
-         -Dhawkular.agent.machine.id=${HOSTNAME} -Djboss.server.name=${HOSTNAME} -Dhawkular.agent.in-container=true \
-         -Dhawkular.rest.feedId=${HOSTNAME} -Dhawkular.agent.immutable=true \
+         -Dhawkular.agent.machine.id=${HOSTNAME} \
+         -Djboss.server.name=${HOSTNAME} \
+         -Dhawkular.agent.in-container=true \
+         -Dhawkular.rest.feedId=${HOSTNAME} \
+         -Dhawkular.agent.immutable=true \
          "$@"
 }
 
@@ -138,7 +112,6 @@ main() {
   get_credentials
   create_user
   add_certificate
-  check_cassandra
   run_hawkular_services "$@"
 }
 

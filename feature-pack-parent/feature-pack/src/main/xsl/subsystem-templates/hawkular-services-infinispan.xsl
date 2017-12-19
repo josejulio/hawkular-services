@@ -24,20 +24,8 @@
   <xsl:template match="//*[local-name()='config']/*[local-name()='supplement' and @name='default']/*[local-name()='replacement' and @placeholder='CACHE-CONTAINERS']">
     <xsl:copy>
       <xsl:apply-templates select="node()|comment()|@*" />
-      <cache-container name="hawkular-alerts" default-cache="triggers" statistics-enabled="true">
-        <local-cache name="partition"/>
-        <local-cache name="triggers"/>
-        <local-cache name="data"/>
-        <local-cache name="publish"/>
-        <local-cache name="schema"/>
-        <local-cache name="dataIds"/>
-        <local-cache name="globalActions"/>
-      </cache-container>
       <cache-container name="hawkular-services" default-cache="backfill" statistics-enabled="true">
         <local-cache name="backfill"/>
-      </cache-container>
-      <cache-container name="hawkular-metrics" default-cache="locks" statistics-enabled="true">
-        <local-cache name="locks"/>
       </cache-container>
     </xsl:copy>
   </xsl:template>

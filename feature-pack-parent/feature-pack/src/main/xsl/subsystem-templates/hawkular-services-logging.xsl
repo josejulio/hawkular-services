@@ -30,8 +30,8 @@
       <logger category="org.hawkular.alerts">
         <level name="${{hawkular.log.alerts:INFO}}" />
       </logger>
-      <logger category="org.hawkular.metrics">
-        <level name="${{hawkular.log.metrics:INFO}}" />
+      <logger category="org.hawkular.alerter">
+        <level name="${{hawkular.log.alerter:INFO}}" />
       </logger>
       <logger category="org.hawkular.inventory.rest.requests">
         <level name="${{hawkular.log.inventory.rest.requests:INFO}}" />
