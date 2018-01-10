@@ -23,7 +23,7 @@
 # configuration file.
 
 # These are the images that are to be started or stopped
-HAWKULAR_SERVICES_IMAGE=hawkular/hawkular-services:hawkular-1275
+HAWKULAR_SERVICES_IMAGE=hawkular/hawkular-services:latest
 PROMETHEUS_IMAGE=prom/prometheus:v2.0.0
 
 # The directory where this script is found (and where the prometheus yml file should be)
